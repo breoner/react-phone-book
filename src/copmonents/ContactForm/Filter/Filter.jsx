@@ -1,16 +1,22 @@
 import { Component } from "react";
-import style from "./Filter.module.css"
+import style from "./Filter.module.css";
 
 class Filter extends Component {
   render() {
+    const { value, onChange } = this.props;
+
     return (
-      <>
-        <label className={style.label}>  
-          Find contact by name
-          <br />
-          <input className={style.input} value={this.props.filter} type="text" name="filter" onChange={this.props.onChange} />
-        </label>
-      </>
+      <label className={style.label}>
+        Find contact by name
+        <br />
+        <input
+          className={style.input}
+          type="text"
+          name="filter"
+          value={value}
+          onChange={onChange}
+        />
+      </label>
     );
   }
 }

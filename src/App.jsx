@@ -15,49 +15,69 @@ class App extends Component {
     filter: "",
   };
 
+  componentDidMount() {
+    const savedContacts = localStorage.getItem("contacts");
+    if (savedContacts) {
+      this.setState({ contacts: JSON.parse(savedContacts) });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.contacts !== prevState.contacts) {
+      localStorage.setItem("contacts", JSON.stringify(this.state.contacts));
+    }
+  }
+
   handleDelete = (contactId) => {
     this.setState((prevState) => ({
-      contacts: prevState.contacts.filter(
-        (contact) => contact.id !== contactId,
-      ),
+      contacts: prevState.contacts.filter((contact) => contact.id !== contactId),
     }));
   };
 
   handleFilter = (evt) => {
-    this.setState({
-      filter: evt.target.value,
-    });
+    this.setState({ filter: evt.target.value });
   };
 
   handleAdd = (newContact) => {
-    const dublicateName = this.state.contacts.some(({ name }) => {
-      return name.toLowerCase() === newContact.name.toLowerCase();
-    });
+    const { contacts } = this.state;
+    const isDuplicate = contacts.some(
+      ({ name }) => name.toLowerCase() === newContact.name.toLowerCase()
+    );
 
-    if (dublicateName) {
-      alert(`${newContact.name} вже існує`);
+    if (isDuplicate) {
+      alert(`${newContact.name} вже існує у списку`);
       return;
     }
 
-    this.setState((prevstate) => {
-      return {
-        contacts: [...prevstate.contacts, newContact],
-      };
-    });
+    this.setState((prevState) => ({
+      contacts: [...prevState.contacts, newContact],
+    }));
   };
 
   render() {
-    const normalizeFilter = this.state.filter.toLowerCase();
-    const filterContact = this.state.contacts.filter((contact) =>
-      contact.name.toLowerCase().includes(normalizeFilter),
+    const { contacts, filter } = this.state;
+    const normalizeFilter = filter.toLowerCase();
+    
+    const filterContact = contacts.filter((contact) =>
+      contact.name.toLowerCase().includes(normalizeFilter)
     );
+
     return (
-      <>
+      <div className="container">
         <h1>Phonebook</h1>
         <ContactForm addContact={this.handleAdd} />
-        <Filter onChange={this.handleFilter} value={this.state.filter}  />
-        <ContactList contacts={filterContact} onDelete={this.handleDelete} />
-      </>
+
+        <h2>Contacts</h2>
+        <Filter 
+          value={filter} 
+          onChange={this.handleFilter} 
+        />
+        
+        <ContactList 
+          contacts={filterContact} 
+          onDelete={this.handleDelete} 
+        />
+      </div>
     );
   }
 }
